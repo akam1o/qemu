@@ -885,7 +885,9 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
     *l2_cache_entry_size = qemu_opt_get_size(
         opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
 
-    *l2_cache_size = MIN(max_l2_cache, l2_cache_max_setting);
+    optimize_l2_cache_size = (bs->total_sectors * BDRV_SECTOR_SIZE * 8
+        + s->cluster_size - 1) / s->cluster_size;
+    *l2_cache_size = MIN(max_l2_cache, optimize_l2_cache_size);
 
     if (combined_cache_size_set) {
         if (l2_cache_size_set && refcount_cache_size_set) {
